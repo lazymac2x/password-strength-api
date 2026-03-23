@@ -1,0 +1,6 @@
+name: password-strength-api
+description: Password strength analyzer. Score entropy crack-time patterns policy generation.
+version: 1
+runtime: typescript
+entry: src/server.js
+mcpPath: /mcp

@@ -1,0 +1,27 @@
+{
+  "name": "password-strength-api",
+  "version": "1.0.0",
+  "description": "Password strength analysis API & MCP server — scoring, entropy, crack time estimation, pattern detection, policy validation, secure generation, breach check",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "password",
+    "strength",
+    "security",
+    "entropy",
+    "crack-time",
+    "pattern-detection",
+    "mcp",
+    "api"
+  ],
+  "author": "lazymac2x",
+  "license": "MIT",
+  "dependencies": {
+    "apify": "^3.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

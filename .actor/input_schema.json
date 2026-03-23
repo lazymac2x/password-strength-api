@@ -1,0 +1,40 @@
+{
+    "title": "Password Strength Analyzer Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "action": {
+            "title": "Action",
+            "type": "string",
+            "description": "What to do: analyze, check_common, validate, generate, breach_check, or batch.",
+            "editor": "select",
+            "enum": ["analyze", "check_common", "validate", "generate", "breach_check", "batch"],
+            "default": "analyze"
+        },
+        "password": {
+            "title": "Password",
+            "type": "string",
+            "description": "The password to analyze (for analyze, check_common, validate, breach_check actions).",
+            "editor": "textfield"
+        },
+        "passwords": {
+            "title": "Passwords (batch)",
+            "type": "array",
+            "description": "Array of passwords for batch analysis.",
+            "editor": "json"
+        },
+        "policy": {
+            "title": "Policy (validate)",
+            "type": "object",
+            "description": "Custom password policy for validation. Example: {\"minLength\": 12, \"requireSpecialChars\": true}",
+            "editor": "json"
+        },
+        "generateOptions": {
+            "title": "Generate Options",
+            "type": "object",
+            "description": "Options for password generation. Example: {\"type\": \"passphrase\", \"words\": 5}",
+            "editor": "json"
+        }
+    },
+    "required": []
+}

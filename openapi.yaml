@@ -1,0 +1,367 @@
+openapi: 3.0.3
+info:
+  title: Password Strength API
+  description: >
+    Comprehensive password strength analysis API. Scoring, entropy, crack time
+    estimation, pattern detection, policy validation, secure generation, and
+    breach checking via HaveIBeenPwned k-anonymity.
+  version: 1.0.0
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3800
+
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  service:
+                    type: string
+                  version:
+                    type: string
+
+  /api/v1/analyze:
+    post:
+      summary: Full password strength analysis
+      description: >
+        Returns score (0-100), entropy (Shannon, combinatorial, effective),
+        crack time estimates for 6 attack scenarios, detected patterns,
+        charset analysis, common password check, and improvement suggestions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: Password to analyze
+              required:
+                - password
+      responses:
+        '200':
+          description: Full analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  password:
+                    type: string
+                    description: Masked password (first 2 chars + asterisks)
+                  length:
+                    type: integer
+                  score:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+                  strength:
+                    type: string
+                    enum: [extremely_weak, very_weak, weak, fair, strong, very_strong]
+                  entropy:
+                    type: object
+                    properties:
+                      shannon:
+                        type: number
+                      combinatorial:
+                        type: number
+                      effective:
+                        type: number
+                  charsetAnalysis:
+                    type: object
+                  patterns:
+                    type: object
+                  crackTimes:
+                    type: object
+                  isCommon:
+                    type: boolean
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Missing password field
+
+  /api/v1/score:
+    post:
+      summary: Quick strength score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+                - password
+      responses:
+        '200':
+          description: Score result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                  label:
+                    type: string
+
+  /api/v1/check-common:
+    post:
+      summary: Check against top 10K common passwords
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+                - password
+      responses:
+        '200':
+          description: Common password check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isCommon:
+                    type: boolean
+                  rank:
+                    type: integer
+                    nullable: true
+                  message:
+                    type: string
+
+  /api/v1/validate:
+    post:
+      summary: Validate password against policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                policy:
+                  type: object
+                  properties:
+                    minLength:
+                      type: integer
+                      default: 8
+                    maxLength:
+                      type: integer
+                      default: 128
+                    requireUppercase:
+                      type: boolean
+                      default: true
+                    requireLowercase:
+                      type: boolean
+                      default: true
+                    requireDigits:
+                      type: boolean
+                      default: true
+                    requireSpecialChars:
+                      type: boolean
+                      default: false
+                    minScore:
+                      type: integer
+                      default: 40
+                    disallowCommon:
+                      type: boolean
+                      default: true
+                    disallowSequences:
+                      type: boolean
+                      default: true
+                    disallowKeyboardWalks:
+                      type: boolean
+                      default: true
+                    customBlacklist:
+                      type: array
+                      items:
+                        type: string
+              required:
+                - password
+      responses:
+        '200':
+          description: Policy validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                  score:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rule:
+                          type: string
+                        passed:
+                          type: boolean
+                        message:
+                          type: string
+                  failedRules:
+                    type: integer
+                  totalRules:
+                    type: integer
+
+  /api/v1/generate:
+    post:
+      summary: Generate secure passwords
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [random, pronounceable, passphrase, pin]
+                  default: random
+                count:
+                  type: integer
+                  default: 1
+                  maximum: 50
+                length:
+                  type: integer
+                  default: 16
+                includeUppercase:
+                  type: boolean
+                  default: true
+                includeLowercase:
+                  type: boolean
+                  default: true
+                includeDigits:
+                  type: boolean
+                  default: true
+                includeSymbols:
+                  type: boolean
+                  default: true
+                excludeAmbiguous:
+                  type: boolean
+                  default: false
+                words:
+                  type: integer
+                  default: 5
+                  description: Word count for passphrase
+                separator:
+                  type: string
+                  default: '-'
+                capitalize:
+                  type: boolean
+                  default: true
+                includeNumber:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Generated password(s) with analysis
+
+  /api/v1/breach-check:
+    post:
+      summary: Breach check via SHA-1 prefix (HaveIBeenPwned compatible)
+      description: >
+        Returns the SHA-1 hash, 5-char prefix, suffix, and instructions
+        for checking against the HaveIBeenPwned Passwords API using
+        k-anonymity. The password never leaves this server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+                - password
+      responses:
+        '200':
+          description: Breach check info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sha1Hash:
+                    type: string
+                  prefix:
+                    type: string
+                  suffix:
+                    type: string
+                  apiUrl:
+                    type: string
+                  howToUse:
+                    type: array
+                    items:
+                      type: string
+                  privacyGuarantee:
+                    type: string
+
+  /api/v1/batch:
+    post:
+      summary: Batch password analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passwords:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 100
+              required:
+                - passwords
+      responses:
+        '200':
+          description: Batch results with summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      averageScore:
+                        type: integer
+                      strengthDistribution:
+                        type: object
+                      commonPasswordCount:
+                        type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: Invalid input

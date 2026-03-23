@@ -1,0 +1,13 @@
+{
+    "actorSpecification": 1,
+    "name": "password-strength-analyzer",
+    "title": "Password Strength Analyzer",
+    "description": "Analyze password strength with entropy calculation, crack time estimation, pattern detection, policy validation, and secure password generation. Supports batch analysis and breach checking via HaveIBeenPwned k-anonymity API.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "dockerfile": "../Dockerfile",
+    "input": "./input_schema.json",
+    "readme": "./README.md",
+    "environmentVariables": {},
+    "categories": ["DEVELOPER_TOOLS"]
+}
