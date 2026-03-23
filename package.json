@@ -20,7 +20,6 @@
   "author": "lazymac2x",
   "license": "MIT",
   "dependencies": {
-    "apify": "^3.7.0",
     "cors": "^2.8.5",
     "express": "^4.21.2"
   }

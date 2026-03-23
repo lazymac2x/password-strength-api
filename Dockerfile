@@ -3,4 +3,4 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
 COPY src/ ./src/
-CMD ["node", "src/main.js"]
+CMD ["node", "src/server.js"]
