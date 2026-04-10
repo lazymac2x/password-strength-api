@@ -98,3 +98,5 @@ curl -X POST http://localhost:3800/mcp \
 
 ## License
 MIT
+
+<sub>💡 Host your own stack? <a href="https://m.do.co/c/c8c07a9d3273">Get $200 DigitalOcean credit</a> via lazymac referral link.</sub>
